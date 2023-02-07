@@ -112,7 +112,7 @@ RUN cd ${TORCH2TRT_REPO_DIR} && \
 
 
 # ==============
-# INSTALL JETBOT
+# INSTALL AIBOT
 # ==============
 ENV AIBOT_REPO_DIR=/opt/aibot
 COPY . ${AIBOT_REPO_DIR}
