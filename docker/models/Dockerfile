@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=aibot-base:jp461
+ARG BASE_IMAGE=aibot-base:jp463
 FROM ${BASE_IMAGE}
 
 RUN python3 -c "import torchvision; \

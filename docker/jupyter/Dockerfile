@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=aibot-models:jp461
+ARG BASE_IMAGE=aibot-models:jp463
 FROM ${BASE_IMAGE}
 
 ARG JUPYTER_PASSWORD=aibot

@@ -1,5 +1,6 @@
 # from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch  
 # PyTorch Container for Jetson and JetPack
+
 ARG BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.9-py3
 FROM ${BASE_IMAGE}
 
@@ -8,37 +9,51 @@ ENV DEBIAN_FRONTEND=noninteractive
 # ====================
 # INSTALL COMMON TOOLS
 # ====================
-RUN apt-get update && apt-get install -y net-tools vim cmake
+# RUN apt-get install kitware-archive-keyring
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 42D5A192B819C5DA
+RUN sed -i 's/deb https:\/\/apt.kitware.com\/ubuntu bionic main/deb https:\/\/apt.kitware.com\/ubuntu bionic main 42D5A192B819C5DA/g' /etc/apt/sources.list
+RUN apt-get update 
+RUN apt-get install -y net-tools vim cmake
 
 
 # ==================
 # INSTALL TENSORFLOW
+# source : https://forums.developer.nvidia.com/t/installing-tensorflow-1-15-on-jetson-nano-2gb-developer-kit-succeeds-but-tensorflow-not-imported/184468/3
 # ==================
-
-ARG HDF5_DIR="/usr/lib/aarch64-linux-gnu/hdf5/serial/"
-ARG MAKEFLAGS=-j6
-RUN apt-get update && \
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran build-essential python3-pip && rm -rf /var/lib/apt/lists/*
-		  
-RUN pip3 install -U pip testresources setuptools==65.5.0 
-RUN pip3 install  -U numpy==1.21.1 future==0.18.2 mock==3.0.5 keras_preprocessing==1.1.2 keras_applications==1.0.8 gast==0.4.0 protobuf pybind11 cython  futures pkgconfig packaging h5py==3.6.0 --verbose
-
-# $JP_VERSION = 461
-# $TF_VERSION = 1.15.5
-# $NV_VERSION = 22.01
-
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran build-essential python3-pip && rm -rf /var/lib/apt/lists/*
+RUN apt-get install python3-pip
+RUN pip3 install -U pip testresources setuptools
+RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
+RUN pip3 install -U numpy==1.19.4 future mock keras_preprocessing keras_applications gast==0.2.1 protobuf pybind11 cython pkgconfig packaging
 RUN pip3 install  --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow==1.15.5+nv22.01
+
+# RUN apt-get update
+# RUN apt-get install -y --no-install-recommends libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran build-essential python3-pip && rm -rf /var/lib/apt/lists/*
+# # must have python python3.8 installed https://forums.developer.nvidia.com/t/how-to-support-python3-8/168813/3
+# RUN pip3 install -U pip testresources setuptools
+# RUN pip3 install  -U setuptools future==0.17.1 mock==3.0.5 keras_preprocessing==1.0.5 keras_applications==1.0.8  --verbose
+# RUN pip3 install -U pip testresources setuptools
+# RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
+# RUN pip3 install -U numpy==1.18.5 future mock keras_preprocessing keras_applications gast==0.2.1 protobuf pybind11 cython pkgconfig packaging
+# # RUN pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow
+# # $JP_VERSION = 461
+# # $TF_VERSION = 1.15.5
+# # $NV_VERSION = 22.01
+
+
 		  
 #Install system packages required by TensorFlow:
-# sudo apt-get update
-# sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran build-essential && rm -rf /var/lib/apt/lists/*
-# sudo apt-get install python3-pip
-# sudo pip3 install -U pip testresources setuptools==65.5.0 
-# sudo pip3 install -U numpy==1.21.1 future==0.18.2 mock==3.0.5 keras_preprocessing==1.1.2 keras_applications==1.0.8 gast==0.4.0 protobuf pybind11 cython  futures pkgconfig packaging h5py==3.6.0 --verbose
-# sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v$JP_VERSION tensorflow==$TF_VERSION+nv$NV_VERSION
+#$ sudo apt-get update
+#$ sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+#$ sudo apt-get install python3-pip
+#$ sudo pip3 install -U pip testresources setuptools
+#$ sudo ln -s /usr/include/locale.h /usr/include/xlocale.h
+#$ sudo pip3 install -U numpy==1.19.4 future mock keras_preprocessing keras_applications gast==0.2.1 protobuf pybind11 cython pkgconfig packaging
+#$ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow
 # sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow==1.15.5+nv22.01
+# !!!!!!  h5py<=2.10.0
+# Successfully installed absl-py-1.4.0 astor-0.8.1 astunparse-1.6.3 gast-0.3.3 google-pasta-0.2.0 grpcio-1.48.2 importlib-metadata-4.8.3 markdown-3.3.7 numpy-1.18.5 opt-einsum-3.3.0 tensorboard-1.15.0 tensorflow-1.15.5+nv22.1 tensorflow-estimator-1.15.1 termcolor-1.1.0 werkzeug-2.0.3 wrapt-1.14.1 zipp-3.6.0
 
 # ==============
 # INSTALL OPENCV
@@ -76,12 +91,16 @@ RUN python3 -m pip install git+https://github.com/ipython/traitlets@dead2b8cdde5
 # Install jupyter lab
 RUN echo -e "\e[48;5;172m Install Jupyter Lab \e[0m"
 RUN apt-get update
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install -y nodejs libffi-dev 
-RUN pip3 install jupyter jupyterlab==3.6.1
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+RUN wget https://nodejs.org/dist/v12.13.0/node-v12.13.0-linux-arm64.tar.xz
+RUN tar -xJf node-v12.13.0-linux-arm64.tar.xz
+RUN cd node-v12.13.0-linux-arm64 && cp -R bin include lib share /usr/local/ && cd .. 
+RUN node -v
+RUN npm -v
+RUN apt-get install -y libffi-dev 
+RUN pip3 install jupyter jupyterlab==3.2.9
 
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+ 
 
 # Install jupyter_clickable_image_widget
 RUN echo "\e[42m Install jupyter_clickable_image_widget \e[0m"
@@ -116,4 +135,4 @@ RUN cd ${TORCH2TRT_REPO_DIR} && \
 # ==============
 ENV AIBOT_REPO_DIR=/opt/aibot
 COPY . ${AIBOT_REPO_DIR}
-RUN cd ${AIBOT_REPO_DIR} && python3 setup.py install
+RUN command cd ${AIBOT_REPO_DIR} && python3 setup.py install

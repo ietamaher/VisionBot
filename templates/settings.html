@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Paramètres</h1>
+     <form id="formId">
+         <div class="w-25">
+            <label for="front_limit" class="form-label">Front Limit Distance:</label>
+            <input type="text" class="form-control" id="front_limit" name="frontLimitDistance" width="20">
+            <br>
+            <label for="rear_limit" class="form-label">Rear Limit Distance:</label>
+            <input type="text" class="form-control" id="rear_limit" name="rearLimitDistance" width="20">
+         </div>
+        <br>
+        <button type="button" class="btn btn-outline-primary" id="saveButton" onclick="saveSettings()">Save</button>
+    </form>
+
+    <a href="/">Home</a>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script  type="text/javascript" charset="utf-8">
+        // Connect to the socket.io server
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        function readSettings() {
+            fetch('/get_settings')
+                .then(response => response.json())
+                .then(data => fillForm(data))
+        }
+
+        function fillForm(data) {
+            console.log(data);
+            document.getElementById("front_limit").value = data.frontLimitDistance;
+            document.getElementById("rear_limit").value = data.rearLimitDistance;
+        }
+
+        function saveSettings() {
+            // Get the form values
+            const frontLimitDistance = document.getElementById('front_limit').value;
+            const rearLimitDistance = document.getElementById('rear_limit').value;
+
+            // Create a data object to send to the server
+            const data = {
+              frontLimitDistance: frontLimitDistance,
+              rearLimitDistance: rearLimitDistance
+            };
+            console.log(data);
+            // Use fetch to send the data to the server
+            fetch('/save_settings', {
+              method: 'POST',
+              body: JSON.stringify(data),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => {
+              if (response.ok) {
+                console.log('Settings saved!');
+              } else {
+                console.log('Error saving settings');
+              }
+            })
+            .catch(error => console.log(error));
+        }
+
+        var form=document.getElementById("formId");
+        function submitForm(event){
+
+           //Preventing page refresh
+           event.preventDefault();
+        }
+
+        //Calling a function during form submission.
+        form.addEventListener('submit', submitForm);
+
+        window.onload = function() {
+            readSettings();
+        }
+
+    </script>
+{% endblock %}

@@ -9,7 +9,7 @@ L4T_REVISION=$(echo $L4T_VERSION_STRING | cut -f 2 -d ',' | grep -Po '(?<=REVISI
 
 export L4T_VERSION="$L4T_RELEASE.$L4T_REVISION"
 
-if [[ $L4T_VERSION = "32.7.1" ]]
+if [[ $L4T_VERSION = "32.7.3" ]]
 then
 	AITBOT_BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.9-py3
 else
